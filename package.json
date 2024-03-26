@@ -1,0 +1,27 @@
+{
+  "name": "js-advanced-practice",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000J\u0000S\u0000-\u0000a\u0000d\u0000v\u0000a\u0000n\u0000c\u0000e\u0000d\u0000-\u0000p\u0000r\u0000a\u0000c\u0000t\u0000i\u0000c\u0000e\u0000\r\u0000 \u0000",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "live-server",
+    "build": "rollup -c --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rithor/JS-advanced-practice.git"
+  },
+  "author": "Vitalii Andrianov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Rithor/JS-advanced-practice/issues"
+  },
+  "homepage": "https://github.com/Rithor/JS-advanced-practice#readme",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "eslint": "^8.57.0",
+    "rollup": "^4.13.0",
+    "rollup-plugin-import-css": "^3.5.0"
+  }
+}
