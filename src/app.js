@@ -1,7 +1,7 @@
 'use strict'
 
 import '../static/global.css';
-import { MainView } from './views/main/mainView.js';
+import { MainView } from './views/mainView.js';
 
 class App {
 

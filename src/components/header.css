@@ -1,0 +1,43 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.menu {
+  display: flex;
+  gap: 27px;
+  align-items: center;
+  font-size: 14px;
+  line-height: 143%;
+  letter-spacing: 0.01em;
+  color: var(--color-black);
+}
+
+.menu__item {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu__searchText {
+  font-weight: 700;
+}
+
+.menu__favoritesText {
+  font-weight: 400;
+}
+
+.menu__favoritesCount {
+  font-weight: 600;
+  font-size: 12px;
+  border: 1px solid var(--color-black);
+  border-radius: 50%;
+  width: 23px;
+  height: 23px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

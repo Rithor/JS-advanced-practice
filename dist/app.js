@@ -18,6 +18,95 @@ class AbstractView {
 
 }
 
+class Div {
+
+  constructor() {
+    this.el = document.createElement('div');
+  }
+
+  render() {
+    this.el;
+  }
+
+}
+
+class Header extends Div {
+
+  constructor(appState) {
+    super();
+    this.appState = appState;
+  }
+
+  render() {
+    this.el.classList.add('header');
+    this.el.innerHTML = `
+        <div class="logo">
+    <img src="./static/svg/main-logo.svg" alt="logo icon">
+  </div>
+  <div class="menu">
+    <a class="menu__item" href="#">
+      <img class="menu__searchIcon" src="./static/svg/search.svg" alt="search icon">
+      <div class="menu__searchText">Book Search</div>
+    </a>
+    <a class="menu__item" href="#">
+      <img class="menu__favoritesIcon" src="./static/svg/favorites.svg" alt="favorites icon">
+      <div class="menu__favoritesText">Favorites</div>
+      <div class="menu__favoritesCount">${this.appState.favorites.length}</div>
+    </a>
+  </div>
+    `;
+
+    return this.el;
+  }
+
+}
+
+class Search extends Div {
+
+  constructor(state) {
+    super();
+    this.state = state;
+  }
+
+  search() {
+    const value = this.el.querySelector('.search__input').value;
+    if (value) {
+      this.state.searchQuery = value;
+    }
+  }
+
+  addListeneres() {
+    this.el
+      .querySelector('.search__btn')
+      .addEventListener('click', () => {
+        this.search();
+      });
+    this.el
+      .querySelector('.search__input')
+      .addEventListener('keydown', (event) => {
+        if (event.code === 'Enter') {
+          this.search();
+        }
+      });
+  }
+
+  render() {
+    this.el.classList.add('search');
+
+    this.el.innerHTML = `
+<div class="search__wrapper">
+    <input class="search__input" type="text" placeholder="Find a book or an author...." value="${this.state.searchQuery ? this.state.searchQuery : ''}">
+    <img src="./static/svg/search.svg" alt="Search icon">
+</div>
+<button class="search__btn"><img src="./static/svg/search-white.svg" alt="Search icon"></button>
+    `;
+
+    this.addListeneres();
+    return this.el;
+  }
+
+}
+
 const PATH_SEPARATOR = '.';
 const TARGET = Symbol('target');
 const UNSUBSCRIBE = Symbol('unsubscribe');
@@ -1117,19 +1206,53 @@ class MainView extends AbstractView {
   constructor(appState) {
     super();
     this.appState = appState;
-    this.appState = onChange(this.appState, this.appStateHook.bind(this));
+    this.appState = onChange(
+      this.appState, this.appStateHook.bind(this)
+    );
+    this.state = onChange(
+      this.state, this.stateHook.bind(this)
+    );
     this.setTitle('Find Books');
   }
 
   appStateHook(path, value) {
-    console.log(path, value);
+    if (path === 'favorites') {
+      console.log(path, value);
+    }
+  }
+
+  async stateHook(path) {
+    if (path === 'searchQuery') {
+      this.state.loading = true;
+      const data = await this.loadList(this.state.searchQuery, this.state.offset);
+      this.state.loading = false;
+      this.state.list = data.docs;
+      console.log(data.docs);
+    }
+  }
+
+  async loadList(searchQuery, offset) {
+    const result = await fetch(
+      `https://openlibrary.org/search.json?q=${searchQuery}&offset=${offset}`
+    );
+    return result.json();
   }
 
   render() {
-    const mainView = document.createElement('div');
-    mainView.innerHTML = `number of books: ${this.appState.favorites.length}`;
     this.app.innerHTML = '';
+    const mainView = document.createElement('div');
+    mainView.classList.add('mainView');
+    mainView.append(
+      new Search(this.state).render()
+    );
     this.app.append(mainView);
+    this.renderHeader();
+  }
+
+  renderHeader() {
+    this.app.prepend(
+      new Header(this.appState).render()
+    );
   }
 
 }

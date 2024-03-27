@@ -1,0 +1,40 @@
+.search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.search__wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+
+.search__input {
+  flex: 1;
+  background: var(--color-gray);
+  border: none;
+  border-radius: 5px;
+  padding: 0px 12px 0px 60px;
+  height: 56px;
+  color: var(--color-black);
+}
+
+.search__input:focus-visible {
+  outline: none;
+}
+
+.search__wrapper img {
+  position: absolute;
+  top: 15px;
+  left: 10px;
+  width: 24px;
+  height: 24px;
+}
+
+.search__btn {
+  border-radius: 5px;
+  padding: 10px 12px;
+  background-color: var(--color-black);
+  border: none;
+}
