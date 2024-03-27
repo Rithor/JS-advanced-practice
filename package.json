@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "live-server",
-    "build": "rollup -c --watch"
+    "build": "rollup -c --watch",
+    "l-s": "live-server --wait=1000"
   },
   "repository": {
     "type": "git",
@@ -23,5 +23,8 @@
     "eslint": "^8.57.0",
     "rollup": "^4.13.0",
     "rollup-plugin-import-css": "^3.5.0"
+  },
+  "dependencies": {
+    "on-change": "^5.0.1"
   }
 }
