@@ -1,12 +1,15 @@
-import { AbstractView } from "../../common/view.js";
-import { Header } from "../../components/header.js";
-import { Search } from "../../components/search.js";
+/* eslint-disable no-case-declarations */
+import { AbstractView } from "../common/view.js";
+import { Header } from "../components/header.js";
+import { CardsList } from "../components/cardsList.js";
+import { Search } from "../components/search.js";
 import onChange from 'on-change';
 
 export class MainView extends AbstractView {
 
   state = {
-    list: [],
+    cardsList: [],
+    numFound: 0,
     loading: false,
     searchQuery: undefined,
     offset: 0,
@@ -24,23 +27,45 @@ export class MainView extends AbstractView {
     this.setTitle('Find Books');
   }
 
-  appStateHook(path, value) {
+  destroy() {
+    onChange.unsubscribe(this.appState);
+    onChange.unsubscribe(this.state);
+  }
+
+  appStateHook(path) {
     if (path === 'favorites') {
-      console.log(path, value);
+      this.render();
     }
   }
 
   async stateHook(path) {
-    if (path === 'searchQuery') {
-      this.state.loading = true;
-      const data = await this.loadList(this.state.searchQuery, this.state.offset);
-      this.state.loading = false;
-      this.state.list = data.docs;
-      console.log(data.docs);
+    console.log(`trigger stateHook with: ${path}`);
+
+    switch (path) {
+
+      case 'searchQuery':
+        this.state.loading = true;
+        const data = await this.loadCardsList(this.state.searchQuery, this.state.offset);
+        this.state.loading = false;
+        this.state.numFound = data.numFound;
+        this.state.cardsList = data.docs;
+        console.log(data);
+        break;
+
+      case 'loading':
+        this.render();
+        break;
+
+      case 'cardsList':
+        this.render();
+        console.log('case cardsList');
+        break;
+
+      default: console.log('stateHook function didn\'t work properly');
     }
   }
 
-  async loadList(searchQuery, offset) {
+  async loadCardsList(searchQuery, offset) {
     const result = await fetch(
       `https://openlibrary.org/search.json?q=${searchQuery}&offset=${offset}`
     );
@@ -49,13 +74,16 @@ export class MainView extends AbstractView {
 
   render() {
     this.app.innerHTML = '';
+    this.renderHeader();
     const mainView = document.createElement('div');
     mainView.classList.add('mainView');
     mainView.append(
       new Search(this.state).render()
     )
+    mainView.append(
+      new CardsList(this.appState, this.state).render()
+    );
     this.app.append(mainView);
-    this.renderHeader();
   }
 
   renderHeader() {

@@ -1,0 +1,79 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  /* width: 180px; */
+  /* height: 288px; */
+  overflow: hidden;
+}
+
+.card__image {
+  background-color: var(--color-gray);
+  display: flex;
+  justify-content: center;
+  padding-top: 10px;
+  flex: 0 0 150px;
+  align-items: start;
+  overflow: hidden;
+}
+
+.card__image img {
+  height: 170px;
+  width: 110px;
+  object-fit: contain;
+}
+
+.card__body {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: start;
+  height: 100%;
+}
+
+.card__text {
+  margin-bottom: 20px;
+}
+
+.card__genre {
+  font-weight: 300;
+  font-size: 10px;
+  color: var(--color-gray);
+  margin-bottom: 2px;
+}
+
+.card__title {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 104%;
+  margin-bottom: 8px;
+}
+
+.card__author {
+  font-weight: 400;
+  font-size: 10px;
+}
+
+.card__favoritesBtn {
+  background-color: var(--color-black);
+  color: white;
+  border: 1px solid #fafafa;
+  border-radius: 6px;
+  width: 36px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.card__favoritesBtn_active {
+  background-color: var(--color-white);
+}
+
+.card__favoritesBtn_active img {
+  filter: invert();
+}

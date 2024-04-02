@@ -61,6 +61,98 @@ class Header extends Div {
 
 }
 
+class Card extends Div {
+
+  constructor(appState, cardState) {
+    super();
+    this.cardState = cardState;
+    this.appState = appState;
+  }
+
+  #removeFromFavorites() {
+    this.appState.favorites = this.appState.favorites.filter(
+      b => b.key !== this.cardState.key
+    );
+  }
+
+  #addToFavorites() {
+    this.appState.favorites.push(this.cardState);
+  }
+
+  render() {
+    this.el.classList.add('card');
+    const existInFavorites = this.appState.favorites.some(
+      b => b.key == this.cardState.key
+    );
+
+    this.el.innerHTML = `
+  <div class="card__image">
+    <img src="https://covers.openlibrary.org/b/OLID/${this.cardState.cover_edition_key}-M.jpg" alt="book's image">
+  </div>
+  <div class="card__body">
+    <div class="card__text">
+        <div class="card__genre">
+          ${this.cardState.subject_facet ? this.cardState.subject_facet[0] : 'not specified'}
+        </div>
+      <div class="card__title">${this.cardState.title}</div>
+      <div class="card__author">${this.cardState.author_name}</div>
+    </div>
+    <button class="card__favoritesBtn ${existInFavorites ? 'card__favoritesBtn_active' : ''}">
+      <img src="./static/svg/favorite-white.svg" alt="favorites icon">
+    </button>
+  </div>
+    `;
+
+    const favoritesBtn = this.el.querySelector('button');
+
+    if (existInFavorites) {
+      favoritesBtn.addEventListener('click', this.#removeFromFavorites.bind(this));
+    } else {
+      favoritesBtn.addEventListener('click', this.#addToFavorites.bind(this));
+    }
+
+    return this.el;
+  }
+
+}
+
+class CardsList extends Div {
+
+  constructor(appState, state) {
+    super();
+    this.appState = appState;
+    this.state = state;
+  }
+
+  render() {
+    if (this.state.loading) {
+      return this.renderWaitingView();
+    }
+
+    this.el.classList.add('cardsList');
+
+    this.el.innerHTML = `<div class="booksFound">Books found – ${this.state.numFound}</div>`;
+
+    const cardsGrid = document.createElement('div');
+    cardsGrid.classList.add('cards__grid');
+    this.el.append(cardsGrid);
+
+    this.state.cardsList.forEach(element => {
+      cardsGrid.append(
+        new Card(this.appState, element).render()
+      );
+    });
+
+    return this.el;
+  }
+
+  renderWaitingView() {
+    const loadAnimation = document.createElement('div');
+    loadAnimation.classList.add('loader');
+    return loadAnimation;
+  }
+}
+
 class Search extends Div {
 
   constructor(state) {
@@ -1194,10 +1286,13 @@ const onChange = (object, onChange, options = {}) => {
 onChange.target = proxy => proxy?.[TARGET] ?? proxy;
 onChange.unsubscribe = proxy => proxy?.[UNSUBSCRIBE] ?? proxy;
 
+/* eslint-disable no-case-declarations */
+
 class MainView extends AbstractView {
 
   state = {
-    list: [],
+    cardsList: [],
+    numFound: 0,
     loading: false,
     searchQuery: undefined,
     offset: 0,
@@ -1215,23 +1310,45 @@ class MainView extends AbstractView {
     this.setTitle('Find Books');
   }
 
-  appStateHook(path, value) {
+  destroy() {
+    onChange.unsubscribe(this.appState);
+    onChange.unsubscribe(this.state);
+  }
+
+  appStateHook(path) {
     if (path === 'favorites') {
-      console.log(path, value);
+      this.render();
     }
   }
 
   async stateHook(path) {
-    if (path === 'searchQuery') {
-      this.state.loading = true;
-      const data = await this.loadList(this.state.searchQuery, this.state.offset);
-      this.state.loading = false;
-      this.state.list = data.docs;
-      console.log(data.docs);
+    console.log(`trigger stateHook with: ${path}`);
+
+    switch (path) {
+
+      case 'searchQuery':
+        this.state.loading = true;
+        const data = await this.loadCardsList(this.state.searchQuery, this.state.offset);
+        this.state.loading = false;
+        this.state.numFound = data.numFound;
+        this.state.cardsList = data.docs;
+        console.log(data);
+        break;
+
+      case 'loading':
+        this.render();
+        break;
+
+      case 'cardsList':
+        this.render();
+        console.log('case cardsList');
+        break;
+
+      default: console.log('stateHook function didn\'t work properly');
     }
   }
 
-  async loadList(searchQuery, offset) {
+  async loadCardsList(searchQuery, offset) {
     const result = await fetch(
       `https://openlibrary.org/search.json?q=${searchQuery}&offset=${offset}`
     );
@@ -1240,13 +1357,16 @@ class MainView extends AbstractView {
 
   render() {
     this.app.innerHTML = '';
+    this.renderHeader();
     const mainView = document.createElement('div');
     mainView.classList.add('mainView');
     mainView.append(
       new Search(this.state).render()
     );
+    mainView.append(
+      new CardsList(this.appState, this.state).render()
+    );
     this.app.append(mainView);
-    this.renderHeader();
   }
 
   renderHeader() {
