@@ -2,11 +2,13 @@
 
 import '../static/global.css';
 import { MainView } from './views/mainView.js';
+import { FavoritesView } from './views/favoritesView.js';
 
 class App {
 
   routes = [
-    { path: '', view: MainView }
+    { path: '', view: MainView },
+    { path: '#favorites', view: FavoritesView }
   ];
 
   appState = {
@@ -23,8 +25,7 @@ class App {
       this.currentView.destroy();
     }
     const view = this.routes
-      .find(route => route.path === location.hash).view;
-
+      .find(route => route.path == location.hash).view;
     this.currentView = new view(this.appState);
     this.currentView.render();
   }

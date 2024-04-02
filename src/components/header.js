@@ -19,7 +19,7 @@ export class Header extends Div {
       <img class="menu__searchIcon" src="./static/svg/search.svg" alt="search icon">
       <div class="menu__searchText">Book Search</div>
     </a>
-    <a class="menu__item" href="#">
+    <a class="menu__item" href="#favorites">
       <img class="menu__favoritesIcon" src="./static/svg/favorites.svg" alt="favorites icon">
       <div class="menu__favoritesText">Favorites</div>
       <div class="menu__favoritesCount">${this.appState.favorites.length}</div>

@@ -8,6 +8,8 @@ export class CardsList extends Div {
     super();
     this.appState = appState;
     this.state = state;
+    console.log(state)
+
   }
 
   render() {
@@ -16,8 +18,6 @@ export class CardsList extends Div {
     }
 
     this.el.classList.add('cardsList');
-
-    this.el.innerHTML = `<div class="booksFound">Books found – ${this.state.numFound}</div>`;
 
     const cardsGrid = document.createElement('div');
     cardsGrid.classList.add('cards__grid');

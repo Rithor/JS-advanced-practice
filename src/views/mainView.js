@@ -79,7 +79,14 @@ export class MainView extends AbstractView {
     mainView.classList.add('mainView');
     mainView.append(
       new Search(this.state).render()
-    )
+    );
+
+    const booksFound = document.createElement('div');
+    booksFound.classList.add('booksFound');
+    booksFound.innerHTML = `<div class="booksFound">Books found – ${this.state.numFound}</div>`;
+    mainView.append(booksFound);
+
+
     mainView.append(
       new CardsList(this.appState, this.state).render()
     );

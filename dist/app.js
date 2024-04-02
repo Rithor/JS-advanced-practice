@@ -48,7 +48,7 @@ class Header extends Div {
       <img class="menu__searchIcon" src="./static/svg/search.svg" alt="search icon">
       <div class="menu__searchText">Book Search</div>
     </a>
-    <a class="menu__item" href="#">
+    <a class="menu__item" href="#favorites">
       <img class="menu__favoritesIcon" src="./static/svg/favorites.svg" alt="favorites icon">
       <div class="menu__favoritesText">Favorites</div>
       <div class="menu__favoritesCount">${this.appState.favorites.length}</div>
@@ -122,6 +122,8 @@ class CardsList extends Div {
     super();
     this.appState = appState;
     this.state = state;
+    console.log(state);
+
   }
 
   render() {
@@ -130,8 +132,6 @@ class CardsList extends Div {
     }
 
     this.el.classList.add('cardsList');
-
-    this.el.innerHTML = `<div class="booksFound">Books found – ${this.state.numFound}</div>`;
 
     const cardsGrid = document.createElement('div');
     cardsGrid.classList.add('cards__grid');
@@ -1363,6 +1363,13 @@ class MainView extends AbstractView {
     mainView.append(
       new Search(this.state).render()
     );
+
+    const booksFound = document.createElement('div');
+    booksFound.classList.add('booksFound');
+    booksFound.innerHTML = `<div class="booksFound">Books found – ${this.state.numFound}</div>`;
+    mainView.append(booksFound);
+
+
     mainView.append(
       new CardsList(this.appState, this.state).render()
     );
@@ -1377,10 +1384,54 @@ class MainView extends AbstractView {
 
 }
 
+/* eslint-disable no-case-declarations */
+
+class FavoritesView extends AbstractView {
+
+  constructor(appState) {
+    super();
+    this.appState = appState;
+    this.appState = onChange(
+      this.appState, this.appStateHook.bind(this)
+    );
+    this.setTitle('Favorites Books');
+  }
+
+  destroy() {
+    onChange.unsubscribe(this.appState);
+  }
+
+  appStateHook(path) {
+    if (path === 'favorites') {
+      this.render();
+    }
+  }
+
+  render() {
+    this.app.innerHTML = '';
+    this.renderHeader();
+    const favoritesView = document.createElement('div');
+    favoritesView.classList.add('favoritesView');
+    favoritesView.innerHTML = `<div class="booksFound">Favorites Books</div>`;
+    favoritesView.append(
+      new CardsList(this.appState, { cardsList: this.appState.favorites }).render()
+    );
+    this.app.append(favoritesView);
+  }
+
+  renderHeader() {
+    this.app.prepend(
+      new Header(this.appState).render()
+    );
+  }
+
+}
+
 class App {
 
   routes = [
-    { path: '', view: MainView }
+    { path: '', view: MainView },
+    { path: '#favorites', view: FavoritesView }
   ];
 
   appState = {
@@ -1397,8 +1448,7 @@ class App {
       this.currentView.destroy();
     }
     const view = this.routes
-      .find(route => route.path === location.hash).view;
-
+      .find(route => route.path == location.hash).view;
     this.currentView = new view(this.appState);
     this.currentView.render();
   }

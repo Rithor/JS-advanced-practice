@@ -6,8 +6,7 @@
   border: 8px solid;
   border-color: #000 #0000;
   animation: l1 1s infinite;
-  margin: 0 auto;
-  /* padding-top: 100px; */
+  margin: 50px auto;
 }
 
 @keyframes l1 {
