@@ -1,0 +1,26 @@
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 143%;
+  letter-spacing: 0.01em;
+  color: var(--color-black);
+}
+
+.pagination__item {
+  display: flex;
+  align-content: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.previousPage::before {
+  content: url(../../static/svg/arrow_back.svg);
+  padding-top: 2px;
+}
+
+.nextPage::after {
+  content: url(../../static/svg/arrow_next.svg);
+  padding-top: 2px;
+}

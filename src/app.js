@@ -33,7 +33,3 @@ class App {
 }
 
 new App();
-
-
-// const testapp = new App();
-// console.log(testapp.routes[0])

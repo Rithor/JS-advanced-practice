@@ -8,13 +8,11 @@ export class CardsList extends Div {
     super();
     this.appState = appState;
     this.state = state;
-    console.log(state)
-
   }
 
   render() {
     if (this.state.loading) {
-      return this.renderWaitingView();
+      return this.#renderWaitingView();
     }
 
     this.el.classList.add('cardsList');
@@ -32,7 +30,7 @@ export class CardsList extends Div {
     return this.el;
   }
 
-  renderWaitingView() {
+  #renderWaitingView() {
     const loadAnimation = document.createElement('div');
     loadAnimation.classList.add('loader');
     return loadAnimation;

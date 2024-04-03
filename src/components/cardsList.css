@@ -1,3 +1,7 @@
+.cardsList {
+  margin-bottom: 30px;
+}
+
 /* HTML: <div class="loader"></div> */
 .loader {
   width: 50px;

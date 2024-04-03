@@ -68,6 +68,47 @@ a {
   justify-content: center;
   align-items: center;
 }
+.search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.search__wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+
+.search__input {
+  flex: 1;
+  background: var(--color-gray);
+  border: none;
+  border-radius: 5px;
+  padding: 0px 12px 0px 60px;
+  height: 56px;
+  color: var(--color-black);
+}
+
+.search__input:focus-visible {
+  outline: none;
+}
+
+.search__wrapper img {
+  position: absolute;
+  top: 15px;
+  left: 10px;
+  width: 24px;
+  height: 24px;
+}
+
+.search__btn {
+  border-radius: 5px;
+  padding: 10px 12px;
+  background-color: var(--color-black);
+  border: none;
+  cursor: pointer;
+}
 .card {
   display: flex;
   flex-direction: column;
@@ -146,6 +187,10 @@ a {
 .card__favoritesBtn_active img {
   filter: invert();
 }
+.cardsList {
+  margin-bottom: 30px;
+}
+
 /* HTML: <div class="loader"></div> */
 .loader {
   width: 50px;
@@ -175,44 +220,29 @@ a {
   line-height: 133%;
   margin-bottom: 18px;
 }
-.search {
+.pagination {
   display: flex;
-  gap: 10px;
-  margin-bottom: 30px;
-}
-
-.search__wrapper {
-  position: relative;
-  flex: 1;
-  display: flex;
-}
-
-.search__input {
-  flex: 1;
-  background: var(--color-gray);
-  border: none;
-  border-radius: 5px;
-  padding: 0px 12px 0px 60px;
-  height: 56px;
+  justify-content: space-between;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 143%;
+  letter-spacing: 0.01em;
   color: var(--color-black);
 }
 
-.search__input:focus-visible {
-  outline: none;
-}
-
-.search__wrapper img {
-  position: absolute;
-  top: 15px;
-  left: 10px;
-  width: 24px;
-  height: 24px;
-}
-
-.search__btn {
-  border-radius: 5px;
-  padding: 10px 12px;
-  background-color: var(--color-black);
-  border: none;
+.pagination__item {
+  display: flex;
+  align-content: center;
+  gap: 10px;
   cursor: pointer;
+}
+
+.previousPage::before {
+  content: url(../../static/svg/arrow_back.svg);
+  padding-top: 2px;
+}
+
+.nextPage::after {
+  content: url(../../static/svg/arrow_next.svg);
+  padding-top: 2px;
 }

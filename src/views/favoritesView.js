@@ -10,7 +10,7 @@ export class FavoritesView extends AbstractView {
     super();
     this.appState = appState;
     this.appState = onChange(
-      this.appState, this.appStateHook.bind(this)
+      this.appState, this.#appStateHook.bind(this)
     );
     this.setTitle('Favorites Books');
   }
@@ -19,7 +19,7 @@ export class FavoritesView extends AbstractView {
     onChange.unsubscribe(this.appState);
   }
 
-  appStateHook(path) {
+  #appStateHook(path) {
     if (path === 'favorites') {
       this.render();
     }
@@ -27,7 +27,7 @@ export class FavoritesView extends AbstractView {
 
   render() {
     this.app.innerHTML = '';
-    this.renderHeader();
+    this.#renderHeader();
     const favoritesView = document.createElement('div');
     favoritesView.classList.add('favoritesView');
     favoritesView.innerHTML = `<div class="booksFound">Favorites Books</div>`;
@@ -37,7 +37,7 @@ export class FavoritesView extends AbstractView {
     this.app.append(favoritesView);
   }
 
-  renderHeader() {
+  #renderHeader() {
     this.app.prepend(
       new Header(this.appState).render()
     );

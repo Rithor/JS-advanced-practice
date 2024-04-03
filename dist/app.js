@@ -61,6 +61,52 @@ class Header extends Div {
 
 }
 
+class Search extends Div {
+
+  constructor(state) {
+    super();
+    this.state = state;
+  }
+
+  #search() {
+    const value = this.el.querySelector('.search__input').value;
+    if (value) {
+      this.state.searchQuery = value;
+    }
+  }
+
+  #addListeneres() {
+    this.el
+      .querySelector('.search__btn')
+      .addEventListener('click', () => {
+        this.#search();
+      });
+    this.el
+      .querySelector('.search__input')
+      .addEventListener('keydown', (event) => {
+        if (event.code === 'Enter') {
+          this.#search();
+        }
+      });
+  }
+
+  render() {
+    this.el.classList.add('search');
+
+    this.el.innerHTML = `
+<div class="search__wrapper">
+    <input class="search__input" type="text" placeholder="Find a book or an author...." value="${this.state.searchQuery ? this.state.searchQuery : ''}">
+    <img src="./static/svg/search.svg" alt="Search icon">
+</div>
+<button class="search__btn"><img src="./static/svg/search-white.svg" alt="Search icon"></button>
+    `;
+
+    this.#addListeneres();
+    return this.el;
+  }
+
+}
+
 class Card extends Div {
 
   constructor(appState, cardState) {
@@ -122,13 +168,11 @@ class CardsList extends Div {
     super();
     this.appState = appState;
     this.state = state;
-    console.log(state);
-
   }
 
   render() {
     if (this.state.loading) {
-      return this.renderWaitingView();
+      return this.#renderWaitingView();
     }
 
     this.el.classList.add('cardsList');
@@ -146,54 +190,42 @@ class CardsList extends Div {
     return this.el;
   }
 
-  renderWaitingView() {
+  #renderWaitingView() {
     const loadAnimation = document.createElement('div');
     loadAnimation.classList.add('loader');
     return loadAnimation;
   }
 }
 
-class Search extends Div {
+class Pagination extends Div {
 
   constructor(state) {
     super();
     this.state = state;
   }
 
-  search() {
-    const value = this.el.querySelector('.search__input').value;
-    if (value) {
-      this.state.searchQuery = value;
+  #runNextPage() {
+    if (this.state.offset + this.state.limit < this.state.numFound) {
+      this.state.offset += 6;
     }
   }
 
-  addListeneres() {
-    this.el
-      .querySelector('.search__btn')
-      .addEventListener('click', () => {
-        this.search();
-      });
-    this.el
-      .querySelector('.search__input')
-      .addEventListener('keydown', (event) => {
-        if (event.code === 'Enter') {
-          this.search();
-        }
-      });
+  #runPreviousPage() {
+    if (this.state.offset - this.state.limit >= 0) {
+      this.state.offset -= 6;
+    }
   }
 
   render() {
-    this.el.classList.add('search');
-
+    this.el.classList.add('pagination');
     this.el.innerHTML = `
-<div class="search__wrapper">
-    <input class="search__input" type="text" placeholder="Find a book or an author...." value="${this.state.searchQuery ? this.state.searchQuery : ''}">
-    <img src="./static/svg/search.svg" alt="Search icon">
-</div>
-<button class="search__btn"><img src="./static/svg/search-white.svg" alt="Search icon"></button>
+          <div class="pagination__item previousPage">Previous page</div>
+          <div class="pagination__item nextPage">Next page</div>
     `;
 
-    this.addListeneres();
+    this.el.querySelector('.previousPage').addEventListener('click', this.#runPreviousPage.bind(this));
+    this.el.querySelector('.nextPage').addEventListener('click', this.#runNextPage.bind(this));
+
     return this.el;
   }
 
@@ -1296,16 +1328,17 @@ class MainView extends AbstractView {
     loading: false,
     searchQuery: undefined,
     offset: 0,
+    limit: 6,
   };
 
   constructor(appState) {
     super();
     this.appState = appState;
     this.appState = onChange(
-      this.appState, this.appStateHook.bind(this)
+      this.appState, this.#appStateHook.bind(this)
     );
     this.state = onChange(
-      this.state, this.stateHook.bind(this)
+      this.state, this.#stateHook.bind(this)
     );
     this.setTitle('Find Books');
   }
@@ -1315,24 +1348,30 @@ class MainView extends AbstractView {
     onChange.unsubscribe(this.state);
   }
 
-  appStateHook(path) {
+  #appStateHook(path) {
     if (path === 'favorites') {
       this.render();
     }
   }
 
-  async stateHook(path) {
+  async #stateHook(path) {
     console.log(`trigger stateHook with: ${path}`);
 
     switch (path) {
 
+      case 'offset':
       case 'searchQuery':
         this.state.loading = true;
-        const data = await this.loadCardsList(this.state.searchQuery, this.state.offset);
+
+        console.log(this.state.offset);
+
+        const data = await this.#loadCardsList(this.state.searchQuery, this.state.offset, this.state.limit);
+
+        console.log(data);
+
         this.state.loading = false;
         this.state.numFound = data.numFound;
         this.state.cardsList = data.docs;
-        console.log(data);
         break;
 
       case 'loading':
@@ -1341,44 +1380,63 @@ class MainView extends AbstractView {
 
       case 'cardsList':
         this.render();
-        console.log('case cardsList');
         break;
 
-      default: console.log('stateHook function didn\'t work properly');
+      default: console.log('stateHook function case default');
     }
   }
 
-  async loadCardsList(searchQuery, offset) {
+  async #loadCardsList(searchQuery, offset, limit) {
     const result = await fetch(
-      `https://openlibrary.org/search.json?q=${searchQuery}&offset=${offset}`
+      `https://openlibrary.org/search.json?q=${searchQuery}&offset=${offset}&limit=${limit}`
     );
     return result.json();
   }
 
   render() {
     this.app.innerHTML = '';
-    this.renderHeader();
+    this.#renderHeader();
+
     const mainView = document.createElement('div');
     mainView.classList.add('mainView');
+
     mainView.append(
       new Search(this.state).render()
     );
 
-    const booksFound = document.createElement('div');
-    booksFound.classList.add('booksFound');
-    booksFound.innerHTML = `<div class="booksFound">Books found – ${this.state.numFound}</div>`;
-    mainView.append(booksFound);
-
+    this.#renderBooksFound(mainView);
 
     mainView.append(
       new CardsList(this.appState, this.state).render()
     );
+
+    this.#renderPagination(mainView);
+
     this.app.append(mainView);
   }
 
-  renderHeader() {
+  #renderHeader() {
     this.app.prepend(
       new Header(this.appState).render()
+    );
+  }
+
+  #renderBooksFound(mainView) {
+    if (this.state.cardsList.length < 1) {
+      return;
+    }
+    const booksFound = document.createElement('div');
+    booksFound.classList.add('booksFound');
+    booksFound.innerHTML = `<div class="booksFound">Books found – ${this.state.numFound}</div>`;
+    mainView.append(booksFound);
+  }
+
+  #renderPagination(mainView) {
+    if (this.state.cardsList.length < 1) {
+      return;
+    }
+    mainView.append(
+      new Pagination(this.state).render()
     );
   }
 
@@ -1392,7 +1450,7 @@ class FavoritesView extends AbstractView {
     super();
     this.appState = appState;
     this.appState = onChange(
-      this.appState, this.appStateHook.bind(this)
+      this.appState, this.#appStateHook.bind(this)
     );
     this.setTitle('Favorites Books');
   }
@@ -1401,7 +1459,7 @@ class FavoritesView extends AbstractView {
     onChange.unsubscribe(this.appState);
   }
 
-  appStateHook(path) {
+  #appStateHook(path) {
     if (path === 'favorites') {
       this.render();
     }
@@ -1409,7 +1467,7 @@ class FavoritesView extends AbstractView {
 
   render() {
     this.app.innerHTML = '';
-    this.renderHeader();
+    this.#renderHeader();
     const favoritesView = document.createElement('div');
     favoritesView.classList.add('favoritesView');
     favoritesView.innerHTML = `<div class="booksFound">Favorites Books</div>`;
@@ -1419,7 +1477,7 @@ class FavoritesView extends AbstractView {
     this.app.append(favoritesView);
   }
 
-  renderHeader() {
+  #renderHeader() {
     this.app.prepend(
       new Header(this.appState).render()
     );
@@ -1456,7 +1514,3 @@ class App {
 }
 
 new App();
-
-
-// const testapp = new App();
-// console.log(testapp.routes[0])

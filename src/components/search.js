@@ -8,24 +8,24 @@ export class Search extends Div {
     this.state = state;
   }
 
-  search() {
+  #search() {
     const value = this.el.querySelector('.search__input').value;
     if (value) {
       this.state.searchQuery = value;
     }
   }
 
-  addListeneres() {
+  #addListeneres() {
     this.el
       .querySelector('.search__btn')
       .addEventListener('click', () => {
-        this.search();
+        this.#search();
       });
     this.el
       .querySelector('.search__input')
       .addEventListener('keydown', (event) => {
         if (event.code === 'Enter') {
-          this.search();
+          this.#search();
         }
       });
   }
@@ -41,7 +41,7 @@ export class Search extends Div {
 <button class="search__btn"><img src="./static/svg/search-white.svg" alt="Search icon"></button>
     `;
 
-    this.addListeneres();
+    this.#addListeneres();
     return this.el;
   }
 
